@@ -34,6 +34,20 @@ Official implementation, consolidated experimental data, and LaTeX source for:
 
 ---
 
+## GPT-2 Small Scale Validation (`NVIDIA A100-SXM4-40GB`, RoPE + RMSNorm)
+
+### Stage 1: Controlled Head-to-Head (`16.4M` Tokens, 1,000 Steps)
+- **`StandardGPT-12` (GPT-2 Small):** `123.6M` total (`85.0M` backbone) → `5.4410` Val Loss (`230.67` PPL)
+- **`QuatTucker-ZigZagGPT-12`:** **`77.6M` total (`39.0M` backbone — `2.2x` smaller!)** → **`5.3706` Val Loss (`215.00` PPL)** — won **5/5 checkpoints** with `46M` fewer parameters!
+
+### Stage 2: Full `1.05B`-Token Pretraining (`84.6k tok/s`)
+- **`QuatTucker-ZigZagGPT-12` (`39.0M` backbone, `1.0B` tokens):** **`3.5849` Best Val Loss (`36.05` PPL)**
+- *Reference (`openai-community/gpt2`, `85.0M` backbone, `~10B` tokens): `3.3439` Val Loss (`28.33` PPL)*
+
+![GPT-2 Scale 1.05B Token Run](figures/fig8_gpt2_scale_1B.png)
+
+---
+
 ## Quickstart
 
 ```python
