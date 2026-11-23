@@ -2,7 +2,7 @@
 
 **Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters and Enabling Exact 2D Zero-Loss Continual Scaling**
 
-[![Preprint DOI](https://img.shields.io/badge/Zenodo%20DOI-10.5281%2Fzenodo.24424502-blue)](https://doi.org/10.5281/zenodo.24424502)
+[![Preprint DOI](https://img.shields.io/badge/Zenodo%20DOI-10.5281%2Fzenodo.24424501-blue)](https://doi.org/10.5281/zenodo.24424501)
 [![HuggingFace Base](https://img.shields.io/badge/HF%20Base-QuatTucker--78M-yellow)](https://huggingface.co/spacetime9/QuatTucker-ZigZagGPT-12-78M)
 [![HuggingFace Chat](https://img.shields.io/badge/HF%20Chat-QuatTucker--78M--Chat-orange)](https://huggingface.co/spacetime9/QuatTucker-ZigZagGPT-12-78M-Chat)
 
@@ -75,7 +75,7 @@ Evaluated with identical length-normalized log-likelihood scoring ($N=500$ valid
   title={Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters and Enabling Exact 2D Zero-Loss Continual Scaling},
   author={Barmase, Shubham},
   year={2026},
-  doi={10.5281/zenodo.24424502},
-  url={https://doi.org/10.5281/zenodo.24424502}
+  doi={10.5281/zenodo.24477893},
+  url={https://doi.org/10.5281/zenodo.24424501}
 }
 ```
