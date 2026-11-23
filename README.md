@@ -43,7 +43,7 @@ Evaluated with identical length-normalized log-likelihood scoring ($N=500$ valid
 
 ## Single-Lineage 2D Continual Scaling (NVIDIA A100-40GB)
 
-| Stage / Checkpoint | Layers / Rank | Total | Backbone | Growth $\max|\Delta|$ | Cum. Tokens | Held-Out `FineWeb-Edu` Val | PPL |
+| Stage / Checkpoint | Layers / Rank | Total | Backbone | Growth `max_diff` | Cum. Tokens | Held-Out `FineWeb-Edu` Val | PPL |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Stage 2 (`best_1B.pt`) | `L=12, R=6144` | 77.6M | 39.0M | — | 1.05B | 3.5849 | 36.05 |
 | Stage 3 (`best_1.5B_grown.pt`) | `L=12, R=8192` | 81.1M | 42.5M | `0.0067` | 1.55B | 3.5963 | 36.46 |
