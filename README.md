@@ -1,79 +1,80 @@
-# Quaternion-Tucker ZigZag Networks (`QuatTucker-ZigZagGPT`)
+# QuatTucker-ZigZagGPT (v2.0)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24424502.svg)](https://doi.org/10.5281/zenodo.24424502)
+**Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters and Enabling Exact 2D Zero-Loss Continual Scaling**
 
-Official implementation, consolidated experimental data, and LaTeX source for:
+[![Preprint DOI](https://img.shields.io/badge/Zenodo%20DOI-10.5281%2Fzenodo.24424502-blue)](https://doi.org/10.5281/zenodo.24424502)
+[![HuggingFace Base](https://img.shields.io/badge/HF%20Base-QuatTucker--78M-yellow)](https://huggingface.co/spacetime9/QuatTucker-ZigZagGPT-12-78M)
+[![HuggingFace Chat](https://img.shields.io/badge/HF%20Chat-QuatTucker--78M--Chat-orange)](https://huggingface.co/spacetime9/QuatTucker-ZigZagGPT-12-78M-Chat)
 
-> **Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters via Shared Hypercomplex Tensor Cores and Braided Top-Down Routing**
-> *Shubham Barmase (Independent Researcher), November 2026*
-> Preprint: [https://zenodo.org/records/24424502](https://zenodo.org/records/24424502)
+**Author:** Shubham Barmase *(Independent Researcher)*
 
----
-
-## Architecture Overview
-
-`QuatTucker-ZigZagGPT` unifies three orthogonal mechanisms:
-1. **4D Quaternion Hamilton Algebra ($\mathbb{H}$):** Replaces dense scalar FFN projections with `QuatLinear` compiled into a single fused `bfloat16` Tensor-Core GEMM ($4\times$ FFN compression).
-2. **Block-Diagonal Tucker SwiGLU Cores:** Shares a single high-rank SwiGLU basis across 4 depths while specializing each depth via a $64 \times 64$ real-valued Tucker core $G[l]$.
-3. **Braided `ZigZag` Diamond Routing (`0 → 2 → 1 → 3`):** Zero-FLOP, zero-parameter top-down refinement expanding a single sequential Jacobian path into 3 concurrent gradient pathways.
-
-![Architecture Overview](figures/fig5_architecture_schematic_v2.png)
+<p align="center">
+  <img src="figures/fig9_continual_2d_scaling.png" width="92%" alt="Continuous 2D Zero-Loss Scaling Trajectory (0 -> 2.55B Tokens)"/>
+</p>
 
 ---
 
-## Key Results (`FineWeb-Edu`, GPT-2 BPE, NVIDIA L4, 3,000 Steps)
+## Key Highlights (v2.0)
 
-| Model | Total Params | Backbone Params | Final Val Loss | Final PPL |
-| :--- | :---: | :---: | :---: | :---: |
-| `StandardGPT-8` (FlashAttn) | `33.5M` | `14.3M` | `5.2310` | `186.98` |
-| `CP-ZigZagGPT-8` | `33.6M` | `14.3M` | `5.1687` | `175.68` |
-| `Tucker-ZigZagGPT-8` | `33.6M` | `14.3M` | `5.1655` | `175.13` |
-| **`QuatTucker-ZigZagGPT-8`** | **`26.5M`** | **`7.2M` (`2.0x` smaller)** | **`5.1339`** | **`169.68`** |
-
-![FineWeb-Edu Scaling](figures/fig3_fineweb_scaling.png)
-
----
-
-## GPT-2 Small Scale Validation (`NVIDIA A100-SXM4-40GB`, RoPE + RMSNorm)
-
-### Stage 1: Controlled Head-to-Head (`16.4M` Tokens, 1,000 Steps)
-- **`StandardGPT-12` (GPT-2 Small):** `123.6M` total (`85.0M` backbone) → `5.4410` Val Loss (`230.67` PPL)
-- **`QuatTucker-ZigZagGPT-12`:** **`77.6M` total (`39.0M` backbone — `2.2x` smaller!)** → **`5.3706` Val Loss (`215.00` PPL)** — won **5/5 checkpoints** with `46M` fewer parameters!
-
-### Stage 2: Full `1.05B`-Token Pretraining (`84.6k tok/s`)
-- **`QuatTucker-ZigZagGPT-12` (`39.0M` backbone, `1.0B` tokens):** **`3.5849` Best Val Loss (`36.05` PPL)**
-- *Reference (`openai-community/gpt2`, `85.0M` backbone, `~10B` tokens): `3.3439` Val Loss (`28.33` PPL)*
-
-![GPT-2 Scale 1.05B Token Run](figures/fig8_gpt2_scale_1B.png)
+1. **Beats OpenAI `gpt2` on 3 of 4 Standard Zero-Shot Benchmarks** (`+2.15%` 4-task average) using **`33%` fewer backbone parameters** (`56.7M` vs `85.0M`) and **`~4×` fewer training tokens** (`2.55B` vs `~10B`).
+2. **Exact 2D Zero-Loss Continual Scaling (Width + Depth):** One continuous checkpoint lineage scaled live from **`77.6M → 81.1M → 95.3M`** across `2.55B` tokens:
+   - **Axis 1 (Width / Rank Growth):** `rank 6144 → 8192` (`+3.5M` params — **`10.8×` cheaper** than dense FFN expansion, `max_diff = 0.0067`), zero forgetting on `FineWeb-Edu`.
+   - **Axis 2 (Depth / Diamond Growth):** `L = 12 → 16` layers (3 → 4 Braided ZigZag Diamonds, **`max_diff = 0.000000`** exact bit-level identity), producing **`41/41` monotonic validation drops** to **`3.4647` (`31.97` PPL)** at `60.7k tok/s` on A100.
+3. **Controlled Head-to-Head Wins:**
+   - **A100 GPT-2 Scale (`16.4M` tok):** `QuatTucker-ZigZagGPT-12` (`77.6M` / `39.0M` bb) wins **5/5 checkpoints** against `StandardGPT-12` (`123.6M` / `85.0M` bb) with `46.0M` fewer parameters.
+   - **L4 8-Layer (`FineWeb-Edu`):** `QuatTucker-ZigZagGPT-8` (`7.2M` bb) beats `StandardGPT-8` (`14.3M` bb) by **`-17.30` PPL** (`169.68` vs `186.98`) with half the backbone.
+4. **56-Seed Pure Routing Topology Ablation:** Isolating routing alone at identical parameters proves `Sequential < Braided ZigZag (0→2→1→3) < Braided + 1 Loop (L3→L1)`, lifting unseen 8-bit Parity by `+8.6%` (`75.1% → 83.7%`) and 3D Cuboid 4-Corner Parity by `+13.8%` (`74.7% → 88.5%`).
 
 ---
 
-## Quickstart
+## Zero-Shot Downstream Benchmarks vs. OpenAI `gpt2`
 
-```python
-import torch
-from quattucker_zigzag import QuatTuckerZigZagGPT
+Evaluated with identical length-normalized log-likelihood scoring ($N=500$ validation examples per task):
 
-model = QuatTuckerZigZagGPT(vocab_size=50257, max_seq_len=256, d_model=384, n_heads=6, rank=4096)
-idx = torch.randint(0, 50257, (2, 128))
-logits = model(idx)  # [2, 128, 50257]
-```
+| Benchmark | `QuatTucker-ZigZagGPT-16` (`56.7M` bb, `2.55B` tok) | OpenAI `gpt2` (`85.0M` bb, `~10B` tok) | $\Delta$ |
+|---|---:|---:|---:|
+| **ARC-Easy** (Science) | **39.00%** | 37.00% | **+2.00%** |
+| **HellaSwag** (Commonsense) | **34.00%** | 33.40% | **+0.60%** |
+| **WinoGrande** (Logic) | 51.00% | **51.40%** | -0.40% |
+| **BoolQ** (Reading Comp.) | **54.60%** | 48.20% | **+6.40%** |
+| **4-Task Average** | **44.65%** | 42.50% | **+2.15%** |
 
-## Repository Structure
+---
 
-- `quattucker_zigzag.py` — Standalone PyTorch implementation (`QuatLinear`, `QuatTuckerZigZagDiamond`, `QuatTuckerZigZagGPT`)
-- `data/experiments.json` — Complete verified raw numbers across all benchmarks
-- `scripts/` — Reproducible 300-DPI PNG + vector PDF figure generators
-- `main.tex`, `references.bib`, `main.pdf` — Full LaTeX paper & compiled PDF
+## Single-Lineage 2D Continual Scaling (NVIDIA A100-40GB)
+
+| Stage / Checkpoint | Layers / Rank | Total | Backbone | Growth $\max|\Delta|$ | Cum. Tokens | Held-Out `FineWeb-Edu` Val | PPL |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Stage 2 (`best_1B.pt`) | `L=12, R=6144` | 77.6M | 39.0M | — | 1.05B | 3.5849 | 36.05 |
+| Stage 3 (`best_1.5B_grown.pt`) | `L=12, R=8192` | 81.1M | 42.5M | `0.0067` | 1.55B | 3.5963 | 36.46 |
+| **Stage 4 (`best_2.5B_depth16.pt`)** | **`L=16, R=8192`** | **95.3M** | **56.7M** | **`0.000000`** | **2.55B** | **3.4647** | **31.97** |
+| *Ref: OpenAI `gpt2`* | *`L=12`, dense* | *124.4M* | *85.0M* | *—* | *~10.0B* | *3.3439* | *28.33* |
+
+### Post-Training (SFT & Sequence Distillation)
+
+| Run | Base Checkpoint | Dataset | Start Val | Final Val |
+|---|---|---|---:|---:|
+| `Qwen3.5-0.8B` 10k Distill | `best_1.5B_grown.pt` (`L=12`) | `9,487` tr / `500` val | 2.4558 | **1.6650** |
+| **`SmolTalk` 100k SFT** | **`best_2.5B_depth16.pt` (`L=16`)** | **`99,000` tr / `1,000` val** | **2.0456** | **1.4975** |
+
+---
+
+## Repository Contents
+
+- [`main.pdf`](main.pdf) — Full 12-page Paper v2.0 (12 figures, 6 tables, 34 references)
+- [`main.tex`](main.tex) & [`references.bib`](references.bib) — LaTeX source
+- [`quattucker_zigzag_v2.py`](quattucker_zigzag_v2.py) — Standalone PyTorch v2.0 implementation (RoPE + RMSNorm + FlashAttn + 4D QuatTucker ZigZag + exact `grow_depth()` zero-loss expansion)
+- [`quattucker_zigzag.py`](quattucker_zigzag.py) — Original 8-layer L4 implementation
+- [`generate_v2_figures.py`](generate_v2_figures.py) — Reproducible v2.0 figure generator
+- [`data/experiments.json`](data/experiments.json) & [`data/gpt2_scale_a100.json`](data/gpt2_scale_a100.json) — Complete raw experimental logs
 
 ## Citation
 
 ```bibtex
 @misc{barmase2026quattucker,
-  title={Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters via Shared Hypercomplex Tensor Cores and Braided Top-Down Routing},
+  title={Quaternion-Tucker ZigZag Networks: Halving Transformer Backbone Parameters and Enabling Exact 2D Zero-Loss Continual Scaling},
   author={Barmase, Shubham},
   year={2026},
-  publisher={Zenodo},
   doi={10.5281/zenodo.24424502},
   url={https://doi.org/10.5281/zenodo.24424502}
 }

@@ -47,5 +47,84 @@
       44.38, 42.83, 43.46, 42.64, 42.16, 41.90, 40.54, 40.73, 38.70, 38.73, 38.57, 38.02,
       38.84, 38.02, 37.67, 36.69, 36.38, 36.71, 36.05, 36.25, 36.51, 36.20
     ]
+  },
+  "stage2_sft_alpaca": {
+    "base_checkpoint": "best_1B.pt",
+    "output_checkpoint": "best_1B_chat.pt",
+    "dataset": "tatsu-lab/alpaca",
+    "final_loss": 2.2251
+  },
+  "stage3_grown_1_55B": {
+    "model": "QuatTucker-ZigZagGPT-12-Grown (81.1M total / 42.5M backbone, rank 6144 -> 8192)",
+    "base_checkpoint": "best_1B.pt",
+    "output_checkpoint": "best_1.5B_grown.pt",
+    "growth_op": "zero_loss_rank_expansion_6144_to_8192",
+    "added_params": 3500000,
+    "step0_max_diff": 0.0067,
+    "step0_val_loss": 3.6221,
+    "data_mix": "50% FineWeb-Edu + 35% Cosmopedia-v2 + 15% OpenWebMath",
+    "val_buffer": "Held-out FineWeb-Edu (same buffer as Stage 2 and OpenAI gpt2 ref)",
+    "best_val_loss": 3.5963,
+    "best_ppl": 36.46,
+    "final_train_loss": 3.0924,
+    "final_tokens_M": 1548.7,
+    "throughput_tok_s": 72100,
+    "logged_steps": [750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000, 5086],
+    "tokens_M": [1122.4, 1147.0, 1171.6, 1196.2, 1220.7, 1245.3, 1269.9, 1294.5, 1319.0, 1343.6, 1368.2, 1392.8, 1417.3, 1441.9, 1466.5, 1491.1, 1515.6, 1540.2, 1548.7],
+    "train_loss": [3.4293, 3.3615, 3.4493, 3.2582, 4.0573, 3.1821, 3.3487, 3.1176, 3.4345, 3.1971, 3.7013, 3.1882, 3.3043, 3.3629, 3.4018, 3.1228, 3.2845, 3.2516, 3.0924],
+    "val_loss": [3.7181, 3.7040, 3.7341, 3.7272, 3.6863, 3.6893, 3.6720, 3.6963, 3.6602, 3.6639, 3.6411, 3.6279, 3.6035, 3.6513, 3.6257, 3.6206, 3.6031, 3.5967, 3.5963],
+    "ppl": [41.18, 40.61, 41.85, 41.56, 39.90, 40.02, 39.33, 40.30, 38.87, 39.01, 38.13, 37.64, 36.73, 38.53, 37.55, 37.36, 36.71, 36.48, 36.46]
+  },
+  "stage3_sft_smoltalk": {
+    "hardware": "NVIDIA Tesla T4",
+    "base_checkpoint": "best_1.5B_grown.pt",
+    "output_checkpoint": "best_1.5B_grown_chat.pt",
+    "dataset": "HuggingFaceTB/smoltalk (40,000 clean pairs)",
+    "steps": [1, 300, 600, 900, 1200, 1500],
+    "loss": [2.3646, 1.9448, 1.9300, 1.9495, 1.7140, 1.6016],
+    "wall_time_s": [2.0, 294.2, 587.5, 880.8, 1174.1, 1467.2]
+  },
+  "stage3_distill_qwen35_10k": {
+    "hardware": "NVIDIA L4",
+    "teacher": "Qwen/Qwen3.5-0.8B (9,987 pairs, 9,487 train / 500 val)",
+    "base_checkpoint": "best_1.5B_grown.pt",
+    "output_checkpoint": "best_1.5B_qwen35_10k.pt",
+    "steps": [0, 200, 400, 600, 800, 1000, 1184],
+    "val_loss": [2.4558, 1.8645, 1.7729, 1.7172, 1.6925, 1.6721, 1.6650],
+    "wall_time_s": 459.3
+  },
+  "stage4_depth16_2_55B": {
+    "hardware": "NVIDIA A100-SXM4-40GB",
+    "model": "QuatTucker-ZigZagGPT-16 (95.31M total / 56.71M backbone, 4 ZigZag Diamonds, rank=8192)",
+    "base_checkpoint": "best_1.5B_grown.pt",
+    "output_checkpoint": "best_2.5B_depth16.pt",
+    "growth_op": "zero_loss_depth_expansion_12_to_16_layers",
+    "added_params": 14200000,
+    "step0_max_diff": 0.0,
+    "step0_val_loss": 3.5670,
+    "data_mix": "60% FineWeb-Edu + 25% Cosmopedia-v2 + 15% OpenWebMath (pre-tokenized uint16 memmap)",
+    "best_val_loss": 3.4647,
+    "best_ppl": 31.97,
+    "final_tokens_M": 2548.7,
+    "throughput_tok_s": 60700,
+    "milestones": {
+      "steps": [0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000, 5250, 5500, 5750, 6000, 6250, 6500, 6750, 7000, 7250, 7500, 7750, 8000, 8250, 8500, 8750, 9000, 9250, 9500, 9750, 10000, 10173],
+      "val_loss": [3.5670, 3.5901, 3.5889, 3.5869, 3.5823, 3.5773, 3.5735, 3.5694, 3.5658, 3.5606, 3.5567, 3.5527, 3.5472, 3.5424, 3.5392, 3.5363, 3.5306, 3.5279, 3.5232, 3.5195, 3.5148, 3.5111, 3.5085, 3.5037, 3.5002, 3.4983, 3.4932, 3.4902, 3.4868, 3.4842, 3.4819, 3.4795, 3.4764, 3.4747, 3.4731, 3.4715, 3.4698, 3.4685, 3.4673, 3.4663, 3.4655, 3.4647],
+      "ppl": [35.41, 36.24, 36.19, 36.12, 35.96, 35.78, 35.64, 35.50, 35.37, 35.19, 35.05, 34.91, 34.72, 34.55, 34.44, 34.34, 34.14, 34.05, 33.89, 33.77, 33.61, 33.48, 33.40, 33.24, 33.12, 33.06, 32.89, 32.79, 32.68, 32.60, 32.52, 32.44, 32.34, 32.29, 32.24, 32.19, 32.13, 32.09, 32.05, 32.02, 31.99, 31.97]
+    }
+  },
+  "stage4_sft_smoltalk_100k": {
+    "hardware": "NVIDIA A100-SXM4-40GB",
+    "base_checkpoint": "best_2.5B_depth16.pt",
+    "output_checkpoint": "best_2.5B_depth16_chat.pt",
+    "dataset": "HuggingFaceTB/smoltalk (99,000 train / 1,000 val)",
+    "steps": [0, 300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3093],
+    "val_loss": [2.0456, 1.6995, 1.6529, 1.6208, 1.5982, 1.5748, 1.5541, 1.5330, 1.5187, 1.5067, 1.4990, 1.4975],
+    "wall_time_min": 22.2
+  },
+  "stage4_zeroshot_benchmarks_N500": {
+    "scoring": "length_normalized_log_likelihood",
+    "QuatTucker-16": {"ARC-Easy": 39.00, "HellaSwag": 34.00, "WinoGrande": 51.00, "BoolQ": 54.60, "Average": 44.65},
+    "OpenAI-gpt2":   {"ARC-Easy": 37.00, "HellaSwag": 33.40, "WinoGrande": 51.40, "BoolQ": 48.20, "Average": 42.50}
   }
 }
