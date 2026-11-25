@@ -126,5 +126,73 @@
     "scoring": "length_normalized_log_likelihood",
     "QuatTucker-16": {"ARC-Easy": 39.00, "HellaSwag": 34.00, "WinoGrande": 51.00, "BoolQ": 54.60, "Average": 44.65},
     "OpenAI-gpt2":   {"ARC-Easy": 37.00, "HellaSwag": 33.40, "WinoGrande": 51.40, "BoolQ": 48.20, "Average": 42.50}
+  },
+  "stage5_depth16_3_55B": {
+    "hardware": "NVIDIA A100-SXM4-40GB",
+    "model": "QuatTucker-ZigZagGPT-16 (95.31M total / 56.71M backbone, 4 ZigZag Diamonds, rank=8192)",
+    "base_checkpoint": "best_2.5B_depth16.pt",
+    "output_checkpoint": "best_3.5B_depth16.pt",
+    "data_mix": "50% FineWeb-Edu (.skip 600k) + 20% Cosmopedia-v2 (.skip 300k) + 15% OpenWebMath (.skip 150k) + 15% Python-Edu (pre-tokenized uint16 memmap, 2.18M tok/s)",
+    "step0_val_loss": 3.4658,
+    "step0_ppl": 32.00,
+    "best_val_loss": 3.4327,
+    "best_ppl": 30.96,
+    "final_train_loss": 3.0454,
+    "final_tokens_M": 3548.8,
+    "throughput_tok_s": 60200,
+    "milestones": {
+      "steps": [0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000, 5750, 6000, 6250, 6500, 6750, 7000, 7250, 7500, 7750, 8000, 8250, 8500, 8750, 9000, 9250, 9500, 9750, 10000, 10173],
+      "val_loss": [3.4658, 3.4914, 3.4960, 3.4996, 3.4978, 3.4970, 3.4957, 3.4950, 3.4922, 3.4912, 3.4883, 3.4882, 3.4833, 3.4835, 3.4792, 3.4770, 3.4749, 3.4721, 3.4697, 3.4666, 3.4658, 3.4573, 3.4565, 3.4533, 3.4507, 3.4485, 3.4471, 3.4446, 3.4435, 3.4428, 3.4408, 3.4396, 3.4381, 3.4369, 3.4355, 3.4345, 3.4344, 3.4341, 3.4331, 3.4327],
+      "ppl": [32.00, 32.83, 32.98, 33.10, 33.04, 33.02, 32.97, 32.95, 32.86, 32.83, 32.73, 32.73, 32.57, 32.57, 32.43, 32.36, 32.30, 32.20, 32.13, 32.03, 32.00, 31.73, 31.71, 31.60, 31.52, 31.45, 31.41, 31.33, 31.30, 31.27, 31.21, 31.17, 31.13, 31.09, 31.05, 31.02, 31.01, 31.00, 30.97, 30.96]
+    }
+  },
+  "stage5_zeroshot_benchmarks_N500": {
+    "scoring": "length_normalized_log_likelihood",
+    "base_checkpoint": "best_3.5B_depth16.pt",
+    "QuatTucker-16-3.55B": {"ARC-Easy": 43.40, "HellaSwag": 34.20, "WinoGrande": 50.80, "BoolQ": 58.40, "Average": 46.70},
+    "QuatTucker-16-2.55B": {"ARC-Easy": 39.00, "HellaSwag": 34.00, "WinoGrande": 51.00, "BoolQ": 54.60, "Average": 44.65},
+    "OpenAI-gpt2":         {"ARC-Easy": 37.00, "HellaSwag": 33.40, "WinoGrande": 51.40, "BoolQ": 48.20, "Average": 42.50}
+  },
+  "stage5_zeroshot_benchmarks_FULL_16955": {
+    "scoring": "length_normalized_log_likelihood",
+    "base_checkpoint": "best_3.5B_depth16.pt",
+    "splits": {"ARC-Easy": 2376, "HellaSwag": 10042, "WinoGrande": 1267, "BoolQ": 3270, "total_questions": 16955},
+    "QuatTucker-16-3.55B": {"ARC-Easy": 40.74, "HellaSwag": 27.55, "WinoGrande": 50.43, "BoolQ": 59.51, "Average": 44.56},
+    "GPT3-Small-125M-300B-ref": {"ARC-Easy": 43.60, "HellaSwag": 33.70, "WinoGrande": 52.00, "BoolQ": 49.70, "Average": 44.75}
+  },
+  "stage6_depth20_5_05B": {
+    "hardware": "NVIDIA A100-SXM4-40GB",
+    "model": "QuatTucker-ZigZagGPT-20 (109.49M total / 70.89M backbone, 5 ZigZag Diamonds, rank=8192)",
+    "base_checkpoint": "best_3.5B_depth16.pt",
+    "output_checkpoint": "best_5B_depth20.pt",
+    "growth_op": "zero_loss_depth_expansion_16_to_20_layers",
+    "added_params": 14180000,
+    "step0_max_diff": 0.0,
+    "step0_val_loss": 3.4284,
+    "step0_ppl": 30.83,
+    "data_mix": "50% FineWeb-Edu + 20% Cosmopedia-v2 + 15% OpenWebMath + 15% Python-Edu (shard-shuffled uint16 memmap, 1.5B tok)",
+    "best_val_loss": 3.4050,
+    "best_ppl": 30.12,
+    "best_step": 14750,
+    "best_tokens_M": 4998.8,
+    "final_tokens_M": 5048.7,
+    "throughput_tok_s": 49200,
+    "zeroshot_FULL_16955": {"ARC-Easy": 42.09, "HellaSwag": 27.97, "WinoGrande": 51.14, "BoolQ": 55.44, "Average": 44.16}
+  },
+  "stage7_cooldown_6_00B": {
+    "hardware": "NVIDIA A100-SXM4-40GB",
+    "model": "QuatTucker-ZigZagGPT-20 (109.49M total / 70.89M backbone, 5 ZigZag Diamonds, rank=8192)",
+    "base_checkpoint": "best_5B_depth20.pt",
+    "output_checkpoint": "best_6B_depth20.pt",
+    "data_mix": "WSD High-Quality Cooldown: 70% FineWeb-Edu + 15% Cosmopedia-v2 + 10% OpenWebMath + 5% Python-Edu (1.0B tok, lr 8e-5 -> 5e-6)",
+    "step0_val_loss": 3.4050,
+    "step0_ppl": 30.12,
+    "best_val_loss": 3.3582,
+    "best_ppl": 28.74,
+    "best_step": 10172,
+    "final_tokens_M": 5998.7,
+    "throughput_tok_s": 48600,
+    "zeroshot_FULL_16955": {"ARC-Easy": 42.17, "HellaSwag": 28.01, "WinoGrande": 52.09, "BoolQ": 56.73, "Average": 44.75},
+    "zeroshot_EXTRA_3510": {"PIQA": 61.43, "ARC-Challenge": 24.74, "OpenBookQA": 27.60}
   }
 }
